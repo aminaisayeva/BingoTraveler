@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NYC Bingo — Feb 2026</title>
+  <title>Bingo Creator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -26,20 +26,268 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* ── Shared bits ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .stars {
+      color: var(--gold);
+      font-size: 18px;
+      letter-spacing: 12px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .divider {
+      margin: 18px auto;
+      width: 120px;
+      height: 1px;
+      background: var(--gold-light);
+      position: relative;
+    }
+    .divider::after {
+      content: '✦';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--cream);
+      padding: 0 8px;
+      color: var(--gold);
+      font-size: 14px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(201,151,63,0.3);
+      text-align: center;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,151,63,0.4); }
+    .btn:active { transform: translateY(0); }
+    .btn[disabled] { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--gold-dark);
+      border: 1.5px solid var(--gold-light);
+      box-shadow: none;
+    }
+    .btn-ghost:hover { box-shadow: none; background: rgba(232,213,163,0.18); }
+
+    /* ── CREATOR SCREEN ── */
+    .creator {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 36px 16px 60px;
+    }
+
+    .creator-head { text-align: center; margin-bottom: 8px; }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 5px;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .big-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      text-align: center;
+    }
+
+    .lead {
+      text-align: center;
+      font-size: 17px;
+      max-width: 440px;
+      margin: 0 auto 8px;
+      opacity: 0.85;
+    }
+
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 17px;
+      font-family: 'Cormorant Garamond', serif;
+      border: 1.5px solid var(--gold-light);
+      border-radius: 8px;
+      outline: none;
+      color: var(--warm-gray);
+      background: white;
+      transition: border-color 0.2s;
+    }
+    .field input:focus { border-color: var(--gold); }
+
+    .section-label {
+      text-align: center;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      font-weight: 600;
+      margin: 8px 0 4px;
+    }
+    .section-hint {
+      text-align: center;
+      font-size: 14px;
+      opacity: 0.7;
+      margin-bottom: 16px;
+    }
+
+    /* Editable 5x5 grid of inputs */
+    .edit-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .edit-cell {
+      aspect-ratio: 1;
+      position: relative;
+      background: white;
+      border: 1px solid var(--gold-light);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s;
+    }
+    .edit-cell:focus-within { border-color: var(--gold); }
+    .edit-cell textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--warm-gray);
+      padding: 6px 3px;
+      line-height: 1.2;
+    }
+    .edit-cell textarea::placeholder { color: rgba(61,53,41,0.28); font-weight: 400; }
+    .edit-cell.free {
+      background: linear-gradient(145deg, rgba(232,213,163,0.27), var(--cream));
+      flex-direction: column;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gold-dark);
+      letter-spacing: 1px;
+    }
+    .edit-cell.free .heart { font-size: 18px; color: rgba(201,151,63,0.55); margin-bottom: 2px; }
+
+    .creator-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    .creator-actions .btn { width: 100%; max-width: 360px; }
+    .save-note {
+      font-size: 13px;
+      opacity: 0.6;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    /* ── SHARE SCREEN ── */
+    .share {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .share-card {
+      background: white;
+      border: 1.5px solid var(--gold-light);
+      border-radius: 16px;
+      padding: 40px 28px;
+      box-shadow: 0 20px 60px rgba(139,105,20,0.08);
+    }
+    .share h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .share p { opacity: 0.8; margin-bottom: 20px; font-size: 16px; }
+    .link-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .link-box input {
+      flex: 1;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: 'Cormorant Garamond', serif;
+      border: 1.5px solid var(--gold-light);
+      border-radius: 8px;
+      outline: none;
+      color: var(--warm-gray);
+      background: var(--cream);
+      min-width: 0;
+    }
+    .copy-btn {
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .share-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+
     /* ── NAME SCREEN ── */
     .name-screen {
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
     }
+    .name-screen.active { display: flex; }
 
     .name-card {
       position: relative;
       background: white;
       border-radius: 16px;
-      padding: 60px 40px 40px;
+      padding: 56px 40px 40px;
       text-align: center;
       max-width: 420px;
       width: 100%;
@@ -47,34 +295,13 @@
       box-shadow: 0 20px 60px rgba(139,105,20,0.08);
       overflow: hidden;
     }
-
-    .name-card::before {
-      content: '';
-      position: absolute;
-      top: -80px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 300px;
-      height: 160px;
-      background: radial-gradient(ellipse at center bottom, rgba(232,213,163,0.2) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .name-stars {
-      color: var(--gold);
-      font-size: 18px;
-      letter-spacing: 12px;
-      margin-bottom: 16px;
-    }
-
     .name-title {
       font-family: 'Playfair Display', serif;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 400;
-      letter-spacing: 6px;
+      letter-spacing: 4px;
       text-transform: uppercase;
     }
-
     .name-subtitle {
       font-size: 13px;
       color: var(--gold);
@@ -83,41 +310,14 @@
       text-transform: uppercase;
       font-weight: 500;
     }
-
-    .name-divider {
-      margin: 20px auto;
-      width: 120px;
-      height: 1px;
-      background: var(--gold-light);
-      position: relative;
-    }
-
-    .name-divider::after {
-      content: '✦';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 0 8px;
-      color: var(--gold);
-      font-size: 14px;
-    }
-
     .name-bingo {
       font-family: 'Playfair Display', serif;
-      font-size: 48px;
+      font-size: 44px;
       font-weight: 900;
       letter-spacing: 10px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
-
-    .name-prompt {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 16px;
-    }
-
+    .name-prompt { font-size: 16px; font-weight: 500; margin-bottom: 16px; }
     .name-input {
       width: 100%;
       padding: 14px 16px;
@@ -131,68 +331,20 @@
       background: rgba(250,246,238,0.4);
       transition: border-color 0.2s;
     }
+    .name-input:focus { border-color: var(--gold); }
+    .name-card .btn { margin-top: 16px; }
 
-    .name-input:focus {
-      border-color: var(--gold);
-    }
-
-    .name-button {
-      margin-top: 16px;
-      padding: 14px 36px;
-      font-size: 16px;
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 600;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(201,151,63,0.3);
-    }
-
-    .name-button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba(201,151,63,0.4);
-    }
-
-    .name-button:active {
-      transform: translateY(0);
-    }
-
-    /* ── MAIN APP ── */
+    /* ── PLAYER APP ── */
     .app {
       display: none;
-      padding: 24px 16px;
+      padding: 24px 16px 40px;
       max-width: 620px;
       margin: 0 auto;
       position: relative;
     }
-
     .app.active { display: block; }
-    .name-screen.hidden { display: none; }
 
-    /* Header */
-    .header {
-      text-align: center;
-      margin-bottom: 24px;
-      position: relative;
-    }
-
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 400px;
-      height: 200px;
-      background: radial-gradient(ellipse at center bottom, rgba(232,213,163,0.13) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
+    .header { text-align: center; margin-bottom: 24px; position: relative; }
     .header-arc {
       font-size: 11px;
       letter-spacing: 5px;
@@ -201,7 +353,14 @@
       font-weight: 600;
       margin-bottom: 4px;
     }
-
+    .header-sub {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      opacity: 0.85;
+    }
     .header-title {
       font-family: 'Playfair Display', serif;
       font-size: 42px;
@@ -209,18 +368,8 @@
       letter-spacing: 8px;
       margin-bottom: 12px;
     }
-
-    .greeting {
-      font-size: 17px;
-      font-weight: 400;
-      margin-bottom: 12px;
-    }
-
-    .greeting-name {
-      font-weight: 700;
-      color: var(--gold);
-      font-family: 'Playfair Display', serif;
-    }
+    .greeting { font-size: 17px; font-weight: 400; margin-bottom: 12px; }
+    .greeting-name { font-weight: 700; color: var(--gold); font-family: 'Playfair Display', serif; }
 
     .progress-outer {
       max-width: 300px;
@@ -230,7 +379,6 @@
       border-radius: 3px;
       overflow: hidden;
     }
-
     .progress-inner {
       height: 100%;
       background: linear-gradient(90deg, var(--gold), var(--gold-dark));
@@ -238,7 +386,6 @@
       transition: width 0.5s ease;
       width: 0%;
     }
-
     .progress-text {
       font-size: 13px;
       color: var(--gold);
@@ -248,14 +395,12 @@
       text-align: center;
     }
 
-    /* Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 6px;
       margin: 0 auto;
     }
-
     .cell {
       position: relative;
       aspect-ratio: 1;
@@ -274,27 +419,19 @@
       font-family: 'Cormorant Garamond', serif;
       animation: fadeInUp 0.4s ease backwards;
     }
-
     .cell:active { transform: scale(0.95); }
-
-    .cell.marked {
-      background: linear-gradient(145deg, #f8f0dd, #f2e8cf);
-      border-color: var(--gold);
-    }
-
+    .cell.marked { background: linear-gradient(145deg, #f8f0dd, #f2e8cf); border-color: var(--gold); }
     .cell.winning {
       background: linear-gradient(145deg, rgba(232,213,163,0.53), rgba(201,151,63,0.27));
       border-color: var(--gold);
       border-width: 2px;
       animation: pulseGlow 2s ease-in-out infinite;
     }
-
     .cell.free {
       background: linear-gradient(145deg, rgba(232,213,163,0.27), var(--cream));
       border-color: var(--gold-light);
       cursor: default;
     }
-
     .cell-x {
       position: absolute;
       top: 50%;
@@ -306,13 +443,7 @@
       line-height: 1;
       pointer-events: none;
     }
-
-    .cell-heart {
-      color: rgba(201,151,63,0.4);
-      font-size: 22px;
-      margin-bottom: 2px;
-    }
-
+    .cell-heart { color: rgba(201,151,63,0.4); font-size: 22px; margin-bottom: 2px; }
     .cell-text {
       font-size: 11px;
       font-weight: 600;
@@ -325,10 +456,8 @@
       z-index: 1;
       padding: 0 2px;
     }
-
     .cell.marked .cell-text { opacity: 0.5; }
     .cell.free .cell-text { opacity: 0.7; }
-
     .cell-glow {
       position: absolute;
       inset: 0;
@@ -338,7 +467,6 @@
       pointer-events: none;
     }
 
-    /* Footer */
     .footer {
       text-align: center;
       margin-top: 24px;
@@ -347,15 +475,22 @@
       letter-spacing: 2px;
       font-weight: 500;
     }
-
     .footer-star { margin: 0 8px; font-size: 10px; }
+    .footer-link {
+      display: block;
+      margin-top: 16px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--gold-dark);
+      opacity: 0.6;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .footer-link:hover { opacity: 1; }
 
-    /* Win banner */
     .win-banner {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       z-index: 999;
       background: linear-gradient(135deg, var(--gold), var(--gold-dark));
       color: white;
@@ -368,86 +503,126 @@
       animation: winSlide 4s ease-in-out forwards;
       box-shadow: 0 4px 20px rgba(139,105,20,0.3);
     }
-
     .win-banner .star { margin: 0 12px; font-size: 16px; }
 
-    /* Confetti */
     .confetti-container {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       pointer-events: none;
       z-index: 1000;
     }
+    .confetti-piece { position: absolute; top: -10px; opacity: 0; animation: confettiFall ease-in forwards; }
 
-    .confetti-piece {
-      position: absolute;
-      top: -10px;
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 8px rgba(201,151,63,0.3); } 50% { box-shadow: 0 0 20px rgba(201,151,63,0.6); } }
+    @keyframes winSlide { 0% { transform: translateY(-100%); opacity: 0; } 10% { transform: translateY(0); opacity: 1; } 90% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100%); opacity: 0; } }
+    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+    @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--warm-gray);
+      color: var(--cream);
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      letter-spacing: 1px;
       opacity: 0;
-      animation: confettiFall ease-in forwards;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 1100;
+      pointer-events: none;
     }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 8px rgba(201,151,63,0.3); }
-      50% { box-shadow: 0 0 20px rgba(201,151,63,0.6); }
-    }
-
-    @keyframes winSlide {
-      0% { transform: translateY(-100%); opacity: 0; }
-      10% { transform: translateY(0); opacity: 1; }
-      90% { transform: translateY(0); opacity: 1; }
-      100% { transform: translateY(-100%); opacity: 0; }
-    }
-
-    @keyframes shimmer {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-
-    @keyframes confettiFall {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-    }
-
-    /* Responsive */
     @media (max-width: 480px) {
-      .grid { gap: 4px; }
+      .grid, .edit-grid { gap: 4px; }
       .cell-text { font-size: 9px; }
       .cell-x { font-size: 28px; }
-      .header-title { font-size: 32px; letter-spacing: 5px; }
+      .header-title, .big-title { font-size: 32px; letter-spacing: 5px; }
       .name-bingo { font-size: 36px; }
+      .edit-cell textarea { font-size: 10px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAME SCREEN -->
-  <div class="name-screen" id="nameScreen">
-    <div class="name-card">
-      <div class="name-stars">✦ ✦ ✦</div>
-      <h1 class="name-title">New York Trip</h1>
-      <p class="name-subtitle">Feb 2026 Edition</p>
-      <div class="name-divider"></div>
-      <h2 class="name-bingo">BINGO</h2>
-      <p class="name-prompt">What's your name, explorer?</p>
-      <input class="name-input" id="nameInput" placeholder="Enter your name..." autofocus />
-      <br />
-      <button class="name-button" id="nameButton">Let's Go ✦</button>
+  <!-- ══ CREATOR SCREEN ══ -->
+  <div class="screen creator" id="creatorScreen">
+    <div class="creator-head">
+      <div class="stars">✦ ✦ ✦</div>
+      <p class="eyebrow">Make your own</p>
+      <h1 class="big-title">BINGO</h1>
+    </div>
+    <div class="divider"></div>
+    <p class="lead">Fill in the title and 24 squares, then share the link with your friends. They each get their own card to play.</p>
+
+    <div class="field">
+      <label for="cTitle">Title</label>
+      <input id="cTitle" placeholder="e.g. New York Trip" maxlength="40" />
+    </div>
+    <div class="field">
+      <label for="cSubtitle">Subtitle <span style="opacity:.6;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input id="cSubtitle" placeholder="e.g. Feb 2026 Edition" maxlength="40" />
+    </div>
+
+    <p class="section-label">The 24 squares</p>
+    <p class="section-hint">Tap any square to type what goes in it. The center is a free space.</p>
+    <div class="edit-grid" id="editGrid"></div>
+
+    <div class="field">
+      <label for="cFooter">Footer note <span style="opacity:.6;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input id="cFooter" placeholder="e.g. made with love" maxlength="60" />
+    </div>
+
+    <div class="creator-actions">
+      <button class="btn" id="createBtn">Create share link ✦</button>
+      <button class="btn btn-ghost" id="fillExampleBtn">Fill with an example</button>
+      <button class="btn btn-ghost" id="clearBtn">Clear all</button>
+      <p class="save-note" id="saveNote">Your draft saves automatically on this device.</p>
     </div>
   </div>
 
-  <!-- MAIN APP -->
+  <!-- ══ SHARE SCREEN ══ -->
+  <div class="screen share" id="shareScreen">
+    <div class="share-card">
+      <div class="stars">✦ ✦ ✦</div>
+      <h2>Your card is ready!</h2>
+      <p>Send this link to anyone. Each friend gets their own playable card, and their progress is saved on their device.</p>
+      <div class="link-box">
+        <input id="shareLink" readonly />
+        <button class="copy-btn" id="copyBtn">Copy</button>
+      </div>
+      <div class="share-actions">
+        <a class="btn" id="openCardBtn">Open the card →</a>
+        <button class="btn btn-ghost" id="backToEditBtn">← Back to editing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NAME SCREEN (player) ══ -->
+  <div class="name-screen" id="nameScreen">
+    <div class="name-card">
+      <div class="stars">✦ ✦ ✦</div>
+      <h1 class="name-title" id="nameTitle">Bingo</h1>
+      <p class="name-subtitle" id="nameSubtitle"></p>
+      <div class="divider"></div>
+      <h2 class="name-bingo">BINGO</h2>
+      <p class="name-prompt">What's your name, explorer?</p>
+      <input class="name-input" id="nameInput" placeholder="Enter your name..." />
+      <br />
+      <button class="btn" id="nameButton">Let's Go ✦</button>
+    </div>
+  </div>
+
+  <!-- ══ PLAYER APP ══ -->
   <div class="app" id="app">
     <header class="header">
-      <p class="header-arc">New York Trip: Feb 2026 Edition</p>
+      <p class="header-arc" id="appTitle">Bingo</p>
+      <p class="header-sub" id="appSubtitle"></p>
       <h1 class="header-title">BINGO</h1>
       <p class="greeting">Hi <span class="greeting-name" id="greetingName"></span>, this is your progress</p>
       <div class="progress-outer">
@@ -460,147 +635,300 @@
 
     <footer class="footer">
       <span class="footer-star">✦</span>
-      www.aminaisthebesttourguide.com
+      <span id="appFooter"></span>
       <span class="footer-star">✦</span>
+      <a class="footer-link" id="makeOwnLink" href="#">✦ Make your own bingo ✦</a>
     </footer>
   </div>
 
+  <div class="toast" id="toast"></div>
+
   <script>
-    const ITEMS = [
-      ["levain cookie", "bibble & sip", "times square", "all'antico vinaio", "souvlaki"],
-      ["williamsburg", "pizza", "soba azuma", "spyscape", "the edge"],
-      ["central park", "broadway show", "FREE", "spot a rat", "live through a crazy subway story"],
-      ["hudson vessel", "washington mews", "museum", "harry potter shop", "grace street"],
-      ["apple store", "7th street burger", "halal cart", "wall street", "joe and the juice"],
-    ];
+    /* ════════════════════════════════════════════════
+       Bingo Creator — fully client-side, no backend.
 
-    const LINES = [
-      // Rows
-      ...Array.from({ length: 5 }, (_, r) => Array.from({ length: 5 }, (_, c) => [r, c])),
-      // Columns
-      ...Array.from({ length: 5 }, (_, c) => Array.from({ length: 5 }, (_, r) => [r, c])),
-      // Diagonals
-      [[0,0],[1,1],[2,2],[3,3],[4,4]],
-      [[0,4],[1,3],[2,2],[3,1],[4,0]],
-    ];
+       HOW DATA IS STORED & SHARED
+       ───────────────────────────
+       • A card's definition (title + 24 squares) is encoded
+         into the share LINK itself (#play=<base64 JSON>).
+         Open the link on any device → the card rebuilds.
+         Nothing to lose: the data lives in the URL.
+       • Each player's progress (marked squares + name) is
+         saved in their own browser's localStorage, keyed to
+         that specific card, so it survives across sessions.
+       • The creator's unfinished draft also auto-saves
+         locally so work isn't lost mid-edit.
+    ════════════════════════════════════════════════ */
 
-    const KEY_NAME = "nycbingo_name";
-    const KEY_GRID = "nycbingo_grid";
+    const GRID = 5;
+    const TOTAL = GRID * GRID;        // 25
+    const CENTER = Math.floor(TOTAL / 2); // index 12 = free space
+    const PLAYABLE = TOTAL - 1;       // 24
 
-    let marked = Array.from({ length: 5 }, () => Array(5).fill(false));
-    marked[2][2] = true; // free space
-    let winningCells = new Set();
-    let hasWon = false;
+    const DRAFT_KEY = "bingo_draft_v1";
 
-    // Load saved state
-    function loadState() {
+    const EXAMPLE = {
+      title: "New York Trip",
+      subtitle: "Feb 2026 Edition",
+      footer: "made with love",
+      squares: [
+        "levain cookie", "bibble & sip", "times square", "all'antico vinaio", "souvlaki",
+        "williamsburg", "pizza", "soba azuma", "spyscape", "the edge",
+        "central park", "broadway show", /*free*/ "spot a rat", "crazy subway story",
+        "hudson vessel", "washington mews", "museum", "harry potter shop", "grace street",
+        "apple store", "7th street burger", "halal cart", "wall street", "joe & the juice"
+      ]
+    };
+
+    /* All 12 winning lines (rows, cols, diagonals) as cell indices */
+    const LINES = (() => {
+      const lines = [];
+      for (let r = 0; r < GRID; r++) lines.push(Array.from({length: GRID}, (_, c) => r * GRID + c));
+      for (let c = 0; c < GRID; c++) lines.push(Array.from({length: GRID}, (_, r) => r * GRID + c));
+      lines.push(Array.from({length: GRID}, (_, i) => i * GRID + i));
+      lines.push(Array.from({length: GRID}, (_, i) => i * GRID + (GRID - 1 - i)));
+      return lines;
+    })();
+
+    /* ── Encoding helpers (unicode-safe base64) ── */
+    function encodeCard(card) {
+      const json = JSON.stringify(card);
+      return btoa(unescape(encodeURIComponent(json)));
+    }
+    function decodeCard(str) {
+      const json = decodeURIComponent(escape(atob(str)));
+      return JSON.parse(json);
+    }
+    /* Small stable hash of the encoded card → namespaces a player's saved progress */
+    function hashString(str) {
+      let h = 5381;
+      for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+      return (h >>> 0).toString(36);
+    }
+
+    /* ── DOM helpers ── */
+    const $ = (id) => document.getElementById(id);
+    function showScreen(id) {
+      ["creatorScreen", "shareScreen", "nameScreen", "app"].forEach((s) => {
+        $(s).classList.toggle("active", s === id);
+      });
+      window.scrollTo(0, 0);
+    }
+    let toastTimer;
+    function toast(msg) {
+      const t = $("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+    }
+
+    /* ════════════ CREATOR ════════════ */
+    function buildEditGrid() {
+      const grid = $("editGrid");
+      grid.innerHTML = "";
+      let inputIdx = 0;
+      for (let i = 0; i < TOTAL; i++) {
+        const cell = document.createElement("div");
+        cell.className = "edit-cell";
+        if (i === CENTER) {
+          cell.classList.add("free");
+          cell.innerHTML = `<span class="heart">♥</span>FREE`;
+        } else {
+          const ta = document.createElement("textarea");
+          ta.placeholder = "tap to type";
+          ta.dataset.idx = inputIdx;
+          ta.addEventListener("input", saveDraft);
+          cell.appendChild(ta);
+          inputIdx++;
+        }
+        grid.appendChild(cell);
+      }
+    }
+
+    function readCreatorForm() {
+      const squares = Array.from(document.querySelectorAll("#editGrid textarea"))
+        .sort((a, b) => a.dataset.idx - b.dataset.idx)
+        .map((ta) => ta.value.trim());
+      return {
+        title: $("cTitle").value.trim(),
+        subtitle: $("cSubtitle").value.trim(),
+        footer: $("cFooter").value.trim(),
+        squares
+      };
+    }
+
+    function writeCreatorForm(card) {
+      $("cTitle").value = card.title || "";
+      $("cSubtitle").value = card.subtitle || "";
+      $("cFooter").value = card.footer || "";
+      const tas = Array.from(document.querySelectorAll("#editGrid textarea"))
+        .sort((a, b) => a.dataset.idx - b.dataset.idx);
+      tas.forEach((ta, i) => { ta.value = (card.squares && card.squares[i]) || ""; });
+    }
+
+    function saveDraft() {
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(readCreatorForm())); } catch {}
+    }
+    function loadDraft() {
       try {
-        const savedGrid = localStorage.getItem(KEY_GRID);
-        if (savedGrid) {
-          marked = JSON.parse(savedGrid);
-          marked[2][2] = true;
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (raw) writeCreatorForm(JSON.parse(raw));
+      } catch {}
+    }
+
+    function handleCreate() {
+      const card = readCreatorForm();
+      if (!card.title) { toast("Give your bingo a title first ✦"); $("cTitle").focus(); return; }
+      const filled = card.squares.filter(Boolean).length;
+      if (filled < PLAYABLE) {
+        toast(`Fill all ${PLAYABLE} squares — ${PLAYABLE - filled} to go`);
+        const firstEmpty = Array.from(document.querySelectorAll("#editGrid textarea"))
+          .sort((a, b) => a.dataset.idx - b.dataset.idx)
+          .find((ta) => !ta.value.trim());
+        if (firstEmpty) firstEmpty.focus();
+        return;
+      }
+      const encoded = encodeCard(card);
+      const url = location.origin + location.pathname + "#play=" + encoded;
+      $("shareLink").value = url;
+      $("openCardBtn").setAttribute("href", "#play=" + encoded);
+      showScreen("shareScreen");
+    }
+
+    /* ════════════ PLAYER ════════════ */
+    let current = null; // { card, encoded, id, marked, name }
+
+    function progressKey(id) { return "bingo_progress_" + id; }
+    function nameKey(id) { return "bingo_name_" + id; }
+
+    function loadPlayer(encoded) {
+      let card;
+      try { card = decodeCard(encoded); }
+      catch { return false; }
+      if (!card || !Array.isArray(card.squares)) return false;
+
+      const id = hashString(encoded);
+      let marked = Array(TOTAL).fill(false);
+      marked[CENTER] = true;
+      try {
+        const saved = localStorage.getItem(progressKey(id));
+        if (saved) {
+          const arr = JSON.parse(saved);
+          if (Array.isArray(arr) && arr.length === TOTAL) marked = arr;
+          marked[CENTER] = true;
         }
       } catch {}
+
+      let name = "";
+      try { name = localStorage.getItem(nameKey(id)) || ""; } catch {}
+
+      current = { card, encoded, id, marked, name, winning: new Set(), hasWon: false };
+      return true;
     }
 
-    function saveGrid() {
-      try {
-        localStorage.setItem(KEY_GRID, JSON.stringify(marked));
-      } catch {}
+    function startPlayer() {
+      const c = current.card;
+      $("nameTitle").textContent = c.title || "Bingo";
+      $("nameSubtitle").textContent = c.subtitle || "";
+      $("appTitle").textContent = c.title || "Bingo";
+      $("appSubtitle").textContent = c.subtitle || "";
+      $("appFooter").textContent = c.footer || "tap a square when it happens";
+
+      if (current.name) {
+        enterBoard(current.name);
+      } else {
+        showScreen("nameScreen");
+        setTimeout(() => $("nameInput").focus(), 100);
+      }
     }
 
-    function saveName(name) {
-      try {
-        localStorage.setItem(KEY_NAME, name);
-      } catch {}
+    function enterBoard(name) {
+      current.name = name;
+      try { localStorage.setItem(nameKey(current.id), name); } catch {}
+      $("greetingName").textContent = name;
+      showScreen("app");
+      checkWins();
+      buildBoard();
+      updateProgress();
     }
 
-    function getSavedName() {
-      try {
-        return localStorage.getItem(KEY_NAME) || "";
-      } catch { return ""; }
+    function squareText(i) {
+      if (i === CENTER) return "FREE";
+      // squares array has 24 entries, indices skip the center
+      const idx = i < CENTER ? i : i - 1;
+      return (current.card.squares[idx] || "");
     }
 
-    // Check wins
+    function buildBoard() {
+      const grid = $("grid");
+      grid.innerHTML = "";
+      for (let i = 0; i < TOTAL; i++) {
+        const cell = document.createElement("button");
+        cell.className = "cell";
+        cell.style.animationDelay = `${i * 0.03}s`;
+
+        const isFree = i === CENTER;
+        const isMarked = current.marked[i];
+        const isWinning = current.winning.has(i);
+
+        if (isMarked) cell.classList.add("marked");
+        if (isWinning) cell.classList.add("winning");
+        if (isFree) cell.classList.add("free");
+
+        let inner = "";
+        if (isMarked && !isFree) inner += `<div class="cell-x">✕</div>`;
+        if (isFree) inner += `<div class="cell-heart">♥</div>`;
+        inner += `<span class="cell-text">${escapeHtml(squareText(i))}</span>`;
+        if (isWinning) inner += `<div class="cell-glow"></div>`;
+        cell.innerHTML = inner;
+
+        if (!isFree) {
+          cell.addEventListener("click", () => {
+            current.marked[i] = !current.marked[i];
+            saveProgress();
+            checkWins();
+            buildBoard();
+            updateProgress();
+          });
+        }
+        grid.appendChild(cell);
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[m]));
+    }
+
+    function saveProgress() {
+      try { localStorage.setItem(progressKey(current.id), JSON.stringify(current.marked)); } catch {}
+    }
+
     function checkWins() {
       const newWinning = new Set();
       for (const line of LINES) {
-        if (line.every(([r, c]) => marked[r][c])) {
-          line.forEach(([r, c]) => newWinning.add(`${r}-${c}`));
-        }
+        if (line.every((i) => current.marked[i])) line.forEach((i) => newWinning.add(i));
       }
-      const hadWin = winningCells.size > 0;
-      winningCells = newWinning;
-
+      const hadWin = current.winning.size > 0;
+      current.winning = newWinning;
       if (newWinning.size > 0 && !hadWin) {
-        hasWon = true;
         showWinBanner();
         launchConfetti();
       }
     }
 
-    // Build grid
-    function buildGrid() {
-      const grid = document.getElementById("grid");
-      grid.innerHTML = "";
-
-      ITEMS.forEach((row, r) => {
-        row.forEach((item, c) => {
-          const cell = document.createElement("button");
-          cell.className = "cell";
-          cell.style.animationDelay = `${(r * 5 + c) * 0.03}s`;
-
-          const isFree = r === 2 && c === 2;
-          const isMarked = marked[r][c];
-          const isWinning = winningCells.has(`${r}-${c}`);
-
-          if (isMarked) cell.classList.add("marked");
-          if (isWinning) cell.classList.add("winning");
-          if (isFree) cell.classList.add("free");
-
-          let inner = "";
-
-          if (isMarked && !isFree) {
-            inner += `<div class="cell-x">✕</div>`;
-          }
-          if (isFree) {
-            inner += `<div class="cell-heart">♥</div>`;
-          }
-
-          inner += `<span class="cell-text">${item}</span>`;
-
-          if (isWinning) {
-            inner += `<div class="cell-glow"></div>`;
-          }
-
-          cell.innerHTML = inner;
-
-          if (!isFree) {
-            cell.addEventListener("click", () => {
-              marked[r][c] = !marked[r][c];
-              saveGrid();
-              checkWins();
-              buildGrid();
-              updateProgress();
-            });
-          }
-
-          grid.appendChild(cell);
-        });
-      });
-    }
-
     function updateProgress() {
-      const count = marked.flat().filter(Boolean).length - 1; // minus free
-      document.getElementById("progressBar").style.width = `${(count / 24) * 100}%`;
-      document.getElementById("progressText").textContent = `${count} / 24 completed`;
+      const count = current.marked.filter(Boolean).length - 1; // minus free
+      $("progressBar").style.width = `${(count / PLAYABLE) * 100}%`;
+      $("progressText").textContent = `${count} / ${PLAYABLE} completed`;
     }
 
     function showWinBanner() {
-      const name = getSavedName();
       const banner = document.createElement("div");
       banner.className = "win-banner";
-      banner.innerHTML = `<span class="star">✦</span> BINGO! You did it, ${name}! <span class="star">✦</span>`;
+      banner.innerHTML = `<span class="star">✦</span> BINGO! You did it, ${escapeHtml(current.name)}! <span class="star">✦</span>`;
       document.body.appendChild(banner);
       setTimeout(() => banner.remove(), 4500);
     }
@@ -609,57 +937,84 @@
       const container = document.createElement("div");
       container.className = "confetti-container";
       const colors = ["#c9973f", "#e8d5a3", "#8b6914", "#fff", "#d4a843", "#f0e6cc"];
-
       for (let i = 0; i < 60; i++) {
         const piece = document.createElement("div");
         piece.className = "confetti-piece";
         const size = 4 + Math.random() * 8;
         piece.style.cssText = `
           left: ${Math.random() * 100}%;
-          width: ${size}px;
-          height: ${size}px;
+          width: ${size}px; height: ${size}px;
           background: ${colors[Math.floor(Math.random() * colors.length)]};
           border-radius: ${size > 8 ? "50%" : "1px"};
           animation-duration: ${2 + Math.random() * 2}s;
-          animation-delay: ${Math.random() * 0.8}s;
-        `;
+          animation-delay: ${Math.random() * 0.8}s;`;
         container.appendChild(piece);
       }
-
       document.body.appendChild(container);
       setTimeout(() => container.remove(), 5000);
     }
 
-    // Show app
-    function showApp(name) {
-      document.getElementById("nameScreen").classList.add("hidden");
-      document.getElementById("app").classList.add("active");
-      document.getElementById("greetingName").textContent = name;
-      loadState();
-      checkWins();
-      buildGrid();
-      updateProgress();
+    /* ════════════ ROUTING & INIT ════════════ */
+    function parseHash() {
+      const h = location.hash || "";
+      const m = h.match(/^#play=(.+)$/);
+      return m ? m[1] : null;
     }
 
-    // Init
-    function init() {
-      const savedName = getSavedName();
-
-      if (savedName) {
-        showApp(savedName);
+    function route() {
+      const encoded = parseHash();
+      if (encoded && loadPlayer(encoded)) {
+        startPlayer();
       } else {
-        document.getElementById("nameButton").addEventListener("click", submitName);
-        document.getElementById("nameInput").addEventListener("keydown", (e) => {
-          if (e.key === "Enter") submitName();
-        });
+        showScreen("creatorScreen");
       }
     }
 
+    function init() {
+      buildEditGrid();
+      loadDraft();
+
+      // Creator events
+      $("createBtn").addEventListener("click", handleCreate);
+      ["cTitle", "cSubtitle", "cFooter"].forEach((id) => $(id).addEventListener("input", saveDraft));
+      $("fillExampleBtn").addEventListener("click", () => {
+        writeCreatorForm(EXAMPLE); saveDraft(); toast("Example loaded — tweak away ✦");
+      });
+      $("clearBtn").addEventListener("click", () => {
+        writeCreatorForm({ title: "", subtitle: "", footer: "", squares: [] });
+        saveDraft(); toast("Cleared");
+      });
+
+      // Share events
+      $("copyBtn").addEventListener("click", async () => {
+        const link = $("shareLink").value;
+        try { await navigator.clipboard.writeText(link); toast("Link copied ✦"); }
+        catch {
+          $("shareLink").select();
+          document.execCommand("copy");
+          toast("Link copied ✦");
+        }
+      });
+      $("backToEditBtn").addEventListener("click", () => showScreen("creatorScreen"));
+
+      // Name events
+      $("nameButton").addEventListener("click", submitName);
+      $("nameInput").addEventListener("keydown", (e) => { if (e.key === "Enter") submitName(); });
+
+      // "Make your own" from a player card
+      $("makeOwnLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        location.hash = "";
+      });
+
+      window.addEventListener("hashchange", route);
+      route();
+    }
+
     function submitName() {
-      const name = document.getElementById("nameInput").value.trim();
-      if (!name) return;
-      saveName(name);
-      showApp(name);
+      const name = $("nameInput").value.trim();
+      if (!name) { toast("Enter your name to start"); return; }
+      enterBoard(name);
     }
 
     init();
